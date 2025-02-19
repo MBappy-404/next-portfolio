@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import About from "./About";
 import Education from "./Education";
-import SkillsSection from "./Experience";
+import SkillsSection from "./Skills";
 import HeroSection from "./Hero";
 import Projects from "./Projects";
 
