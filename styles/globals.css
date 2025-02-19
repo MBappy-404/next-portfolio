@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* @keyframes subtleColorShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 100% 50%;
+    }
+  }
+  
+  .animated-overlay {
+    background: linear-gradient(120deg, rgba(4, 40, 104, 0.5), rgba(4, 40, 104, 0.1));
+    background-size: 200% 200%;
+    animation: subtleColorShift 6s infinite alternate ease-in-out;
+  }
+   */
+  
