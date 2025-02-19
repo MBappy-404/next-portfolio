@@ -7,15 +7,14 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable import/order */
 /* eslint-disable react/jsx-no-undef */
- 
- 
+
 import { Chip } from "@heroui/chip";
 import Image from "next/image";
 
-type Params = Promise<{ id: string }>
+type Params = Promise<{ id: string }>;
 
 export default async function Page({ params }: { params: Params }) {
-  const { id } = await params;  
+  const { id } = await params;
 
   const res = await fetch(
     `https://portfolio-server-xi-three.vercel.app/api/blogs/${id}`,
@@ -36,15 +35,16 @@ export default async function Page({ params }: { params: Params }) {
       <div className="flex justify-center flex-col items-start mx-auto max-w-[1100px]">
         <div className="bg-gray-100 w-full dark:bg-gray-800 cursor-pointer rounded overflow-hidden p-2 md:p-5">
           <div className=" rounded-md">
-          <h3 className="text-xl md:text-3xl pb-4 font-bold text-gray-800 dark:text-gray-200">
+            <h3 className="text-xl md:text-3xl pb-4 font-bold text-gray-800 dark:text-gray-200">
               {blog?.title ?? "No Title Available"}
             </h3>
             <Image
               src={blog?.blogImage}
               alt={blog?.title ?? "Blog image"}
-              className="rounded-md  "
+              className="rounded-md border border-gray-200 dark:border-gray-700 w-full"
               layout="responsive"
-              width={500}
+              blurDataURL="/data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII="
+              width={1300}
               height={500}
             />
           </div>
@@ -52,11 +52,11 @@ export default async function Page({ params }: { params: Params }) {
             <Chip className="uppercase mb-2" radius="sm">
               {blog?.category ?? "Uncategorized"}
             </Chip>
-            <span className="text-sm block text-gray-400 dark:text-gray-500 mb-2">
+            <span className="text-sm block text-gray-400 dark:text-gray-400 mb-2">
               {blog?.createdAt?.slice(0, 10) ?? "Unknown date"} | BY{" "}
               <span className="uppercase">{blog?.author ?? "Unknown"}</span>
             </span>
-           
+
             <hr className="my-3 border-t border-gray-300 dark:border-gray-600" />
             <p className="text-gray-600 dark:text-gray-400 text-justify text-sm md:text-base xl:text-lg">
               {blog?.description ?? "No description available"}

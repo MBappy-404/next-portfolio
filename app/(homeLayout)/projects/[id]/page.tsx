@@ -24,13 +24,15 @@ const page = async ({ params }: { params: Params }) => {
   return (
     <div className="bg-white dark:bg-gray-950 md:px-5 px-2 pt-5 pb-10 ">
       <div className="bg-gray-100 dark:bg-gray-800 rounded-md flex justify-center flex-col items-start mx-auto max-w-[1100px] p-2 md:p-5">
-        <div>
+        <div className="w-full">
           <Image
             src={project.projectImage}
             alt={project.projectName}
-            className="rounded-md"
+            className="rounded-md border border-gray-200 dark:border-gray-700 w-full"
+            placeholder="blur"
+            blurDataURL="/data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII="
             layout="responsive"
-            width={500}
+            width={1300}
             height={500}
           />
         </div>
@@ -62,7 +64,7 @@ const page = async ({ params }: { params: Params }) => {
             <h2 className="text-xl md:text-3xl pt-2 font-bold text-gray-800 dark:text-white mb-2">
               Links
             </h2>
-            <div className="flex flex-wrap items-center self-center justify-start gap-5 mt-2">
+            <div className="flex flex-wrap items-center self-center justify-start gap-5 mt-4">
               <div>
                 <a target="_blank" href={project?.liveProjectLink}>
                   <Button
@@ -80,7 +82,7 @@ const page = async ({ params }: { params: Params }) => {
                 <a target="_blank" href={project?.frontendGitHubLink}>
                   <Button
                     as={"div"}
-                    className=" last:text-sm md:text-base text-gray-900 dark:text-gray-100 px-4"
+                    className=" text-sm md:text-base text-gray-900 dark:text-gray-100 px-4"
                     color="primary"
                     radius="sm"
                     variant="flat"
@@ -98,7 +100,7 @@ const page = async ({ params }: { params: Params }) => {
                     radius="sm"
                     variant="flat"
                   >
-                    Frontend Code
+                    Backend Code
                   </Button>
                 </a>
               </div>

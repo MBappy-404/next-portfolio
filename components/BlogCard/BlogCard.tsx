@@ -84,7 +84,7 @@ const BlogCard = ({ blog }: { blog: TBlog }) => {
               </Button>
             </div>
           ) : (
-            <div>
+            <div className="mt-3">
               <Button
                 onPress={() => router.push(`/blogs/${blog._id}`)}
                 as={"div"}

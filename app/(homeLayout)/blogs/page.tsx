@@ -13,7 +13,7 @@ export default async function BlogPage() {
   const data = await res.json();
   return (
     <div>
-      <div className="  my-4">
+      <div className="  py-10">
         <div className=" max-w-[1300px] mx-auto px-3 md:px-5">
           <div className="text-center">
             <h3 className="text-[35px] md:text-4xl font-semibold text-gray-900 dark:text-gray-300">

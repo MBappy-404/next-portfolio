@@ -12,7 +12,7 @@ const Projects = async () => {
   const res = await fetch("https://portfolio-server-xi-three.vercel.app/api/projects");
   const data = await res.json();
   return (
-    <div className="bg-white dark:bg-gray-950 md:px-5 px-3 py-5 ">
+    <div className="bg-white dark:bg-gray-950 md:px-5 px-3 py-10">
       <div className=" mx-auto max-w-[1300px] md:px-5">
       <div className="text-center">
             <h3 className="text-[35px] md:text-4xl font-semibold text-gray-900 dark:text-gray-300">

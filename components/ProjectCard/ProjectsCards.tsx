@@ -48,7 +48,7 @@ const ProjectsCards = ({ project }: { project: TProject }) => {
           </h3>
           <hr className="my-3  border-t border-gray-300 dark:border-gray-600 " />
           <p className="text-gray-400 dark:text-gray-400  md:text-base text-sm">
-            {project.projectDescription.slice(0, 120)}
+            {project.projectDescription.slice(0, 120)}....
           </p>
           {pathname === "/dashboard/manage-projects" ? (
             <div className="flex justify-between mt-4">
@@ -73,7 +73,7 @@ const ProjectsCards = ({ project }: { project: TProject }) => {
               </Button>
             </div>
           ) : (
-            <div>
+            <div className="mt-3">
               <div>
                 <Button
                   onPress={() => router.push(`/projects/${project._id}`)}

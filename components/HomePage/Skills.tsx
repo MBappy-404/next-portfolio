@@ -26,7 +26,7 @@ const SkillsSection = () => {
     { key: "stripe", label: "Stripe" },
   ];
   return (
-    <section className="w-full py-16 dark:bg-gray-950 bg-white text-gray-800 dark:text-white">
+    <section className="w-full pt-5 pb-10 dark:bg-gray-950 bg-white text-gray-800 dark:text-white">
       <div className="container mx-auto px-4">
         <div className="text-center">
           <h3 className="text-[35px] md:text-4xl font-semibold text-gray-900 dark:text-gray-300">
