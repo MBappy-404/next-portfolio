@@ -71,7 +71,7 @@ const Footer = () => {
             <li>
               <a
                 href="javascript:void(0)"
-                className="dark:text-gray-100 text-gray-700 hover:text-white dark:hover:text-black text-base"
+                className="dark:text-gray-100 text-gray-700  text-base"
               >
                 Home
               </a>
@@ -79,7 +79,7 @@ const Footer = () => {
             <li>
               <a
                 href="javascript:void(0)"
-                className="dark:text-gray-100 text-gray-700 hover:text-white dark:hover:text-black text-base"
+                className="dark:text-gray-100 text-gray-700  text-base"
               >
                 Projects
               </a>
@@ -87,7 +87,7 @@ const Footer = () => {
             <li>
               <a
                 href="javascript:void(0)"
-                className="dark:text-gray-100 text-gray-700 hover:text-white dark:hover:text-black text-base"
+                className="dark:text-gray-100 text-gray-700  text-base"
               >
                 Blogs
               </a>
@@ -95,7 +95,7 @@ const Footer = () => {
             <li>
               <a
                 href="javascript:void(0)"
-                className="dark:text-gray-100 text-gray-700 hover:text-white dark:hover:text-black text-base"
+                className="dark:text-gray-100 text-gray-700  text-base"
               >
                 Contact
               </a>

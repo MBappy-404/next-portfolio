@@ -1,19 +1,18 @@
 /* eslint-disable prettier/prettier */
 import About from "./About";
 import Education from "./Education";
-import Experience from "./Experience";
+import SkillsSection from "./Experience";
 import HeroSection from "./Hero";
 import Projects from "./Projects";
- 
 
 const HomagePage = () => {
   return (
     <div>
       <HeroSection />
-      <About/>
-      <Experience/>
-      <Projects/>
-      <Education/>
+      <About />
+      <SkillsSection />
+      <Projects />
+      <Education />
     </div>
   );
 };
