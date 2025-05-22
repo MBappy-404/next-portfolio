@@ -49,11 +49,7 @@ const Dashboard = ({
           <Header session={session} />
 
           <div className="my-10 px-2">{children}</div>
-          <Toaster
-            style={{
-              textTransform: "uppercase",
-            }}
-          />
+          
         </section>
       </div>
     </div>

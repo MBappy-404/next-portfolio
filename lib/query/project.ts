@@ -40,10 +40,13 @@ export async function addBlog(formData: FormData) {
   const response = await fetch("https://portfolio-server-xi-three.vercel.app/api/blogs/create-blog", {
     method: "POST",
     body: formData,
+    credentials: "include", 
   });
+
   const data = await response.json();
   return data;
 }
+
 export async function updateBlog(formData: FormData, blogId: string) {
   const response = await fetch(`https://portfolio-server-xi-three.vercel.app/api/blogs/${blogId}`, {
     method: "PUT",
@@ -78,6 +81,18 @@ export async function addMessage(message : any) {
 export async function getALlMessage() {
   const response = await fetch("https://portfolio-server-xi-three.vercel.app/api/message", {
     method: "GET",
+  });
+  const data = await response.json();
+  return data;
+}
+
+export async function createAdmin(adminData: any) {
+  const response = await fetch("https://portfolio-server-xi-three.vercel.app/api/admin/create-admin", {
+    method: "POST",
+     headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(adminData),
   });
   const data = await response.json();
   return data;

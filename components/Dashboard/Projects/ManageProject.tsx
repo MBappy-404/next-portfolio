@@ -23,11 +23,9 @@ const ManageProject = ({ data }: { data: { data: TProject[] } }) => {
         {/* Page Title */}
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
-            Projects  
+           All Projects  
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            Manage your project details below.
-          </p>
+          
         </div>
 
         <AddProjectModal />

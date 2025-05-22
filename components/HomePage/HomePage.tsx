@@ -10,9 +10,9 @@ const HomagePage = () => {
     <div>
       <HeroSection />
       <About />
-      <SkillsSection />
+      {/* <SkillsSection />
       <Projects />
-      <Education />
+      <Education /> */}
     </div>
   );
 };

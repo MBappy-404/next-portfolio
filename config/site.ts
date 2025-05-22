@@ -19,10 +19,10 @@ export const siteConfig = {
       label: "Contact",
       href: "/contact",
     },
-    {
-      label: "Dashboard",
-      href: "/dashboard/manage-projects",
-    },
+    // {
+    //   label: "Dashboard",
+    //   href: "/dashboard/manage-projects",
+    // },
   ],
   navMenuItems: [
     {
@@ -42,10 +42,10 @@ export const siteConfig = {
       label: "Contact",
       href: "/contact",
     },
-    {
-      label: "Dashboard",
-      href: "/dashboard/manage-projects",
-    },
+    // {
+    //   label: "Dashboard",
+    //   href: "/dashboard/manage-projects",
+    // },
   ],
   links: {
     github: "https://github.com/heroui-inc/heroui",

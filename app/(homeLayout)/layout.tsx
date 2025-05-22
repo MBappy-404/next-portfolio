@@ -13,6 +13,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/utils/authOptions";
 import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Saroar Jahan Bappy | Full Stack Developer & MERN Expert",
@@ -86,10 +87,16 @@ export default async function RootLayout({
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div>
-            <Navbar session={session} />
+            {/* <Navbar session={session} /> */}
             <main className="min-h-screen dark:bg-gray-950">{children}</main>
           </div>
-          <Footer />
+          <Toaster
+            richColors
+            style={{
+              textTransform: "uppercase",
+            }}
+          />
+          {/* <Footer /> */}
         </Providers>
       </body>
     </html>

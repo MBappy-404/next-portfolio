@@ -79,7 +79,7 @@ export default function EditBlogsModal({
   return (
     <>
       {/* <Button onPress={onOpen}>Add New Blog</Button> */}
-      <Modal size="3xl" isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal size="3xl" isOpen={isOpen} backdrop="blur" onOpenChange={onOpenChange}>
         <ModalContent>
           <form onSubmit={handleSubmit(handleUpdateBlog)}>
             <ModalHeader className="flex flex-col gap-1">

@@ -15,13 +15,25 @@ import { Chip } from "@heroui/chip";
 import { Button } from "@heroui/button";
 import { TBlog } from "@/types";
 import { toast } from "sonner";
-
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from "@heroui/modal";
+import parse from 'html-react-parser';
 /* eslint-disable react/jsx-sort-props */
 const BlogCard = ({ blog }: { blog: TBlog }) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const { 
+    isOpen: isDeleteOpen, 
+    onOpen: onDeleteOpen, 
+    onOpenChange: onDeleteOpenChange, 
+    onClose: onDeleteClose 
+  } = useDisclosure();
   const pathname = usePathname();
   const router = useRouter();
-  // console.log(pathname);
 
   const handleDelete = async (id: string) => {
     const toastId = toast.loading("Deleting Blog...");
@@ -32,8 +44,10 @@ const BlogCard = ({ blog }: { blog: TBlog }) => {
         duration: 2000,
       });
       router.refresh();
+      onDeleteClose();
     }
   };
+
   return (
     <div>
       <div className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-800 cursor-pointer rounded overflow-hidden shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] relative  ">
@@ -52,12 +66,12 @@ const BlogCard = ({ blog }: { blog: TBlog }) => {
             {blog.createdAt.slice(0, 10)} | BY{" "}
             <span className="uppercase">{blog.author}</span>
           </span>
-          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+          <h3 className="text-xl truncate font-bold text-gray-800 dark:text-gray-200">
             {blog.title}
           </h3>
           <hr className="my-3  border-t border-gray-300 dark:border-gray-600 " />
           <p className="text-gray-400 dark:text-gray-400 text-sm">
-            {blog.description.slice(0, 120)}....
+            {parse(blog.description.slice(0, 120))}....
           </p>
           {pathname === "/dashboard/manage-blogs" ? (
             <div className="flex justify-between mt-4">
@@ -68,15 +82,13 @@ const BlogCard = ({ blog }: { blog: TBlog }) => {
                 variant="flat"
                 radius="sm"
               >
-                {" "}
                 Edit
               </Button>
 
               <Button
-                // endContent={}
-                onPress={() => handleDelete(blog._id)}
+                onPress={onDeleteOpen}
                 className="text-base text-gray-900 dark:text-gray-100 px-8"
-                color="primary"
+                color="danger"
                 radius="sm"
                 variant="flat"
               >
@@ -105,6 +117,39 @@ const BlogCard = ({ blog }: { blog: TBlog }) => {
           onClose={onClose}
         />
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal 
+        isOpen={isDeleteOpen} 
+        onOpenChange={onDeleteOpenChange}
+        backdrop="blur"
+      >
+        <ModalContent>
+          <ModalHeader>Confirm Deletion</ModalHeader>
+          <ModalBody>
+            <p className="text-gray-600 dark:text-gray-300">
+              Are you sure you want to delete this blog post? This action cannot be undone.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button 
+              color="default" 
+              variant="flat" 
+              onPress={onDeleteClose}
+              radius="sm"
+            >
+              Cancel
+            </Button>
+            <Button 
+              color="danger" 
+              onPress={() => handleDelete(blog._id)}
+              radius="sm"
+            >
+              Confirm Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

@@ -20,6 +20,7 @@ import { fontSans } from "@/config/fonts";
 
 import { Providers } from "@/app/(homeLayout)/providers";
 import Dashboard from "@/components/Dashboard/Dashboard";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "SJ Bappy",
@@ -47,6 +48,12 @@ export default async function RootLayout({
               <Dashboard session={session} children={children} />
             </div>
           </div>
+          <Toaster
+            richColors
+            style={{
+              textTransform: "uppercase",
+            }}
+          />
         </Providers>
       </body>
     </html>

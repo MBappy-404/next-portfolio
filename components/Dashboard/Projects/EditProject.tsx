@@ -1,13 +1,11 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable padding-line-between-statements */
 /* eslint-disable import/order */
+/* eslint-disable padding-line-between-statements */
 /* eslint-disable no-console */
-/* eslint-disable prettier/prettier */
-/* eslint-disable react/self-closing-comp */
 /* eslint-disable react/jsx-sort-props */
-/* eslint-disable prettier/prettier */
 "use client";
-import {  updateProject } from "@/lib/query/project";
+
+import { updateProject } from "@/lib/query/project";
 import { TProject } from "@/types";
 import { Button } from "@heroui/button";
 import {
@@ -16,12 +14,18 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  useDisclosure,
 } from "@heroui/modal";
 import { Select, SelectItem } from "@heroui/select";
 import { SharedSelection } from "@heroui/system";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FieldValues, SubmitErrorHandler, useForm } from "react-hook-form";
+import {
+  Controller,
+  useForm,
+  FieldValues,
+  SubmitHandler,
+} from "react-hook-form";
 import { toast } from "sonner";
 
 export const technologies = [
@@ -39,6 +43,7 @@ export const technologies = [
   { key: "Node.js", label: "Node.js" },
   { key: "Express.js", label: "Express.js" },
   { key: "MongoDB", label: "MongoDB" },
+  { key: "Prisma", label: "Prisma" },
   { key: "Firebase", label: "Firebase" },
   { key: "Next Auth", label: "Next Auth" },
   { key: "Vercel", label: "Vercel" },
@@ -51,12 +56,20 @@ export const technologies = [
   { key: "Stripe", label: "Stripe" },
   { key: "Shurjo Pay", label: "Shurjo Pay" },
 ];
+
+const categories = [
+  { key: "fullstack", label: "Fullstack" },
+  { key: "UX/UI", label: "UX/UI" },
+  { key: "Inventory", label: "Inventory" },
+  { key: "Uncategorized", label: "Uncategorized" },
+   
+];
 interface EditProjectModalProps {
   project: TProject;
   isOpen: boolean;
-  onOpen: () => void;
-  onOpenChange: (isOpen: boolean) => void;
+  onOpenChange: (open: boolean) => void;
   onClose: () => void;
+   
 }
 
 export default function EditProjectModal({
@@ -65,159 +78,196 @@ export default function EditProjectModal({
   onOpenChange,
   onClose,
 }: EditProjectModalProps) {
-  const { handleSubmit, register, reset } = useForm();
-  const [values, setValues] = useState<string[]>(project?.technologies || []);
   const router = useRouter();
+  const { control, register, reset, handleSubmit, watch } = useForm<FieldValues>({
+    defaultValues: {
+      projectName: "",
+      frontendGitHubLink: "",
+      backendGitHubLink: "",
+      liveProjectLink: "",
+      technologies: [],
+      category: "uncategorized",
+      featured: false,
+      projectDescription: "",
+      projectImage: null,
+    },
+  });
+
   useEffect(() => {
     if (project) {
       reset({
-        projectName: project.projectName || "",
-        projectImage: project.projectImage || "",
-        frontendGitHubLink: project.frontendGitHubLink || "",
-        backendGitHubLink: project.backendGitHubLink || "",
-        liveProjectLink: project.liveProjectLink || "",
-        technologies: project.technologies || [],
-        projectDescription: project.projectDescription || "",
+        projectName: project.projectName,
+        frontendGitHubLink: project.frontendGitHubLink,
+        backendGitHubLink: project.backendGitHubLink,
+        liveProjectLink: project.liveProjectLink,
+        technologies: project.technologies,
+        category: project.category || "uncategorized",
+        featured: project.featured || false,
+        projectDescription: project.projectDescription,
+        projectImage: project.projectImage || null,
       });
     }
   }, [project, reset]);
-  const handleSelectionChange = (keys: SharedSelection) => {
-    setValues(Array.from(keys) as string[]); // Convert Set to array
-  };
-  const handleUpdateProject: SubmitErrorHandler<FieldValues> = async (data) => {
-    const toastId = toast.loading("Updating Project...");
-    const formData = new FormData();
-    const technologiesArray = values;
-    const projectData = {
-      ...data,
-      technologies: technologiesArray,
-    };
 
-    console.log(projectData);
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const toastId = toast.loading("Updating project...");
+    try {
+      const formData = new FormData();
+      const payload = {
+        ...data,
+        technologies: data.technologies,
+      };
+      
+      formData.append("data", JSON.stringify(payload));
+      if (data.projectImage?.[0]) {
+        formData.append("file", data.projectImage[0]);
+      }
 
-    formData.append("data", JSON.stringify(projectData));
-    if (
-      data.projectImage &&
-      Array.isArray(data.projectImage) &&
-      data.projectImage[0]
-    ) {
-      formData.append("file", data.projectImage[0]);
-    }
+      console.log(data.projectImage);
+      
 
-    // console.log(Object.fromEntries(formData));
-
-    const res = await updateProject(formData, project._id);
-    console.log(res);
-
-    if (res?.success) {
-      toast.success("Project updated successfully", {
-        id: toastId,
-        duration: 2000,
-      });
-      router.refresh();
-      onClose();
-    } else {
-      toast.success("Failed to update project", {
-        id: toastId,
-        duration: 2000,
-      });
+      const res = await updateProject(formData, project._id);
+      if (res?.success) {
+        toast.success("Project updated!", { id: toastId });
+        router.refresh();
+        onClose();
+      } else {
+        toast.error(res?.error?.message || "Update failed", { id: toastId });
+      }
+    } catch (err) {
+      toast.error("Unexpected error", { id: toastId });
     }
   };
 
   return (
-    <>
-      {/* <Button onPress={onOpen}>Add New Blog</Button> */}
-      <Modal size="3xl" isOpen={isOpen} onOpenChange={onOpenChange}>
-        <ModalContent>
-          <form onSubmit={handleSubmit(handleUpdateProject)}>
-            <ModalHeader className="flex flex-col gap-1">
-              Add New Blog
-            </ModalHeader>
-            <ModalBody>
-              <div className="flex justify-center mt-0">
-                <div className="w-full max-w-3xl space-y-4">
-                  {/* Project Name & Upload Project Image (Same Row) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Project Name"
-                      {...register("projectName")}
-                      className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                    />
-                    <input
-                      type="file"
-                      {...register("projectImage")}
-                      className="  w-full bg-white dark:bg-gray-800 text-sm py-0 rounded-md outline-none border-[#dddddd] dark:border-gray-800 border focus:border-[#c5c4c4] transition-all file:cursor-pointer cursor-pointer file:border-0 file:py-[12px] file:px-4 file:mr-4 file:bg-[#DDDDDD]  dark:file:bg-gray-700 dark:focus:border-gray-700 dark:file:text-gray-300 file:text-black dark:text-gray-300"
-                      placeholder="Upload Photo"
-                    />
-                  </div>
+    <Modal
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      size="4xl"
+      backdrop="blur"
+    >
+      <ModalContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <ModalHeader>Update Project</ModalHeader>
+          <ModalBody>
+            <div className="space-y-6">
+              {/* Name & Image */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  {...register("projectName", { required: true })}
+                  placeholder="Project Name"
+                  className="w-full rounded-md py-2 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
+                />
+                <input
+                  type="file"
+                  {...register("projectImage")}
+                  className="w-full bg-white dark:bg-gray-800 text-sm rounded-md outline-none border border-gray-300 dark:border-gray-800 focus:border-gray-500 dark:focus:border-gray-700 file:cursor-pointer file:border-0 file:py-3 file:px-4 file:mr-4 file:bg-gray-200 dark:file:bg-gray-700 file:text-black dark:file:text-gray-300"
+                />
+              </div>
 
-                  {/* GitHub Links (2 columns) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      {...register("frontendGitHubLink")}
-                      placeholder="Frontend GitHub Link"
-                      className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                    />
-                    <input
-                      type="text"
-                      {...register("backendGitHubLink")}
-                      placeholder="Backend GitHub Link"
-                      className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                    />
-                  </div>
+              {/* GitHub + Live Links */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input
+                  {...register("frontendGitHubLink", { required: true })}
+                  placeholder="Frontend GitHub Link"
+                  className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
+                />
+                <input
+                  {...register("backendGitHubLink")}
+                  placeholder="Backend GitHub Link"
+                  className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
+                />
+                <input
+                  {...register("liveProjectLink")}
+                  placeholder="Live Project Link"
+                  className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
+                />
+              </div>
 
-                  {/* Live Project Link */}
-                  <div className="md:flex w-full   gap-4  ">
-                    <input
-                      type="text"
-                      placeholder="Live Project Link"
-                      {...register("liveProjectLink")}
-                      className="w-full  max-w-[355px]  rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                    />
+              {/* Tech / Category / Featured */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Technologies */}
+                <Controller
+                  control={control}
+                  name="technologies"
+                  render={({ field: { value, onChange } }) => (
                     <Select
-                      className="bg-gray-100 hover:bg-gray-100  mt-4 md:mt-0 max-w-[351px]  dark:bg-gray-800"
-                      // label="Select Technologies"
-                      classNames={{
-                        base: "w-full border-gray-300 dark:border-gray-800  rounded-md max-w-[365px] bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700",
-                        innerWrapper: "bg-gray-100   dark:bg-gray-800 ",
-                        trigger:
-                          "bg-gray-100 focus:bg-gray-100 dark:bg-gray-800",
-                        selectorIcon: "bg-gray-100 dark:bg-gray-800",
-                      }}
-                      placeholder="Update Technologies"
-                      selectedKeys={values}
+                      placeholder="Select Technologies"
                       selectionMode="multiple"
-                      onSelectionChange={handleSelectionChange}
+                      selectedKeys={new Set(value)}
+                      onSelectionChange={(keys) => onChange(Array.from(keys))}
+                      classNames={{
+                        base: "w-full rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:ring-2 focus:ring-purple-500",
+                        selectorIcon: "text-gray-500 dark:text-gray-400",
+                      }}
                     >
-                      {technologies.map((technology) => (
-                        <SelectItem key={technology.key}>
-                          {technology.label}
-                        </SelectItem>
+                      {technologies.map((tech) => (
+                        <SelectItem key={tech.key}>{tech.label}</SelectItem>
                       ))}
                     </Select>
-                  </div>
+                  )}
+                />
 
-                  {/* Project Description */}
-                  <textarea
-                    placeholder="Project Description"
-                    rows={4}
-                    {...register("projectDescription")}
-                    className="w-full rounded-md px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm pt-3 outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                  ></textarea>
-                </div>
+                {/* Category */}
+                <Controller
+                  control={control}
+                  name="category"
+                  render={({ field: { value, onChange } }) => (
+                    <Select
+                      placeholder="Select Category"
+                      selectionMode="single"
+                      selectedKeys={new Set([value])}
+                      onSelectionChange={(keys) => 
+                        onChange(keys instanceof Set ? Array.from(keys)[0] : "")
+                      }
+                    >
+                      {categories.map((cat:any) => (
+                        <SelectItem key={cat.key}>{cat.label}</SelectItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+
+                {/* Featured */}
+                <Controller
+                  control={control}
+                  name="featured"
+                  render={({ field: { value, onChange } }) => (
+                    <Select
+                      placeholder="Is Featured?"
+                      selectionMode="single"
+                      selectedKeys={new Set([value ? "yes" : "no"])}
+                      onSelectionChange={(keys) =>
+                        onChange(Array.from(keys)[0] === "yes")
+                      }
+                      classNames={{
+                        base: "w-full rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:ring-2 focus:ring-purple-500",
+                      }}
+                    >
+                      <SelectItem key="yes">Yes</SelectItem>
+                      <SelectItem key="no">No</SelectItem>
+                    </Select>
+                  )}
+                />
               </div>
-            </ModalBody>
 
-            <ModalFooter>
-              <Button type="submit" color="primary">
-                Update
-              </Button>
-            </ModalFooter>
-          </form>
-        </ModalContent>
-      </Modal>
-    </>
+              {/* Description */}
+              <textarea
+                {...register("projectDescription")}
+                placeholder="Project Description"
+                rows={4}
+                className="w-full rounded-md px-4 py-3 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
+              />
+            </div>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button type="submit" color="primary" radius="sm">
+              Update
+            </Button>
+          </ModalFooter>
+        </form>
+      </ModalContent>
+    </Modal>
   );
 }

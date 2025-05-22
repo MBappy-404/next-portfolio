@@ -14,10 +14,22 @@ import EditProjectModal from "../Dashboard/Projects/EditProject";
 import { toast } from "sonner";
 import { Button } from "@heroui/button";
 import { TProject } from "@/types";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from "@heroui/modal";
 
-/* eslint-disable prettier/prettier */
 const ProjectsCards = ({ project }: { project: TProject }) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const { 
+    isOpen: isDeleteOpen, 
+    onOpen: onDeleteOpen, 
+    onOpenChange: onDeleteOpenChange, 
+    onClose: onDeleteClose 
+  } = useDisclosure();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -30,8 +42,10 @@ const ProjectsCards = ({ project }: { project: TProject }) => {
         duration: 2000,
       });
       router.refresh();
+      onDeleteClose();
     }
   };
+
   return (
     <div>
       <div className="bg-white border border-gray-200 dark:border-gray-700 dark:bg-gray-800 cursor-pointer rounded overflow-hidden shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] relative  ">
@@ -58,15 +72,13 @@ const ProjectsCards = ({ project }: { project: TProject }) => {
                 className="text-base text-gray-900 dark:text-gray-100 px-10"
                 variant="flat"
               >
-                {" "}
                 Edit
               </Button>
 
               <Button
-                // endContent={}
-                onPress={() => handleDelete(project._id)}
+                onPress={onDeleteOpen}
                 className="text-base text-gray-900 dark:text-gray-100 px-8"
-                color="primary"
+                color="danger"
                 variant="flat"
               >
                 Delete
@@ -90,13 +102,45 @@ const ProjectsCards = ({ project }: { project: TProject }) => {
           )}
         </div>
       </div>
+
+      {/* Edit Project Modal */}
       <EditProjectModal
         project={project}
         isOpen={isOpen}
-        onOpen={onOpen}
         onOpenChange={onOpenChange}
         onClose={onClose}
       />
+
+      {/* Delete Confirmation Modal */}
+      <Modal 
+        isOpen={isDeleteOpen} 
+        onOpenChange={onDeleteOpenChange}
+        backdrop="blur"
+      >
+        <ModalContent>
+          <ModalHeader>Confirm Deletion</ModalHeader>
+          <ModalBody>
+            <p className="text-gray-600 dark:text-gray-300">
+              Are you sure you want to delete this project? This action cannot be undone.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button 
+              color="default" 
+              variant="flat" 
+              onPress={onDeleteClose}
+            >
+              Cancel
+            </Button>
+            <Button 
+              color="danger" 
+              onPress={() => handleDelete(project._id)}
+            >
+              Confirm Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

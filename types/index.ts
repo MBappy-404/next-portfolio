@@ -25,6 +25,8 @@ export type TProject = {
   backendGitHubLink: string;
   liveProjectLink: string;
   technologies: string[];
+  category: string;
+  featured: string;
   projectDescription: string;
   createdAt: string;
   updatedAt: string;

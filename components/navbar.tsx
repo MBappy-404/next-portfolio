@@ -83,9 +83,9 @@ export const Navbar = ({ session }: { session: UserProps | null }) => {
           <NavbarItem className="hidden sm:flex gap-2">
             <ThemeSwitch />
           </NavbarItem>
-          <NavbarItem>
+          {/* <NavbarItem>
             <SignInModal session={session} />
-          </NavbarItem>
+          </NavbarItem> */}
 
           <Button
             className="text-base text-gray-800 dark:text-white"
@@ -119,7 +119,7 @@ export const Navbar = ({ session }: { session: UserProps | null }) => {
                 </NextLink>
               </NavbarMenuItem>
             ))}
-            <SignInModal session={session} />
+            {/* <SignInModal session={session} /> */}
           </div>
         </NavbarMenu>
       </NavbarContent>

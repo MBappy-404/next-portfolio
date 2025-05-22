@@ -10,7 +10,7 @@
 
 import { Chip } from "@heroui/chip";
 import Image from "next/image";
-
+import parse from 'html-react-parser';
 type Params = Promise<{ id: string }>;
 
 export default async function Page({ params }: { params: Params }) {
@@ -59,7 +59,7 @@ export default async function Page({ params }: { params: Params }) {
 
             <hr className="my-3 border-t border-gray-300 dark:border-gray-600" />
             <p className="text-gray-600 dark:text-gray-400 text-justify text-sm md:text-base xl:text-lg">
-              {blog?.description ?? "No description available"}
+              {parse(blog?.description) ?? "No description available"}
             </p>
           </div>
         </div>

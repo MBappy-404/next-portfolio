@@ -77,8 +77,7 @@ const About = () => {
         />
         {/* Gradient Overlay for Image Effect */}
         <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-[#042868] via-transparent to-transparent opacity-50"></div>
-        {/* Circular Blur Effect */}
-        {/* <div className="absolute top-0 right-0 w-[250px] h-[250px] bg-[#042868] opacity-50 blur-3xl rounded-full"></div> */}
+        
       </div>
     </div>
   </div>

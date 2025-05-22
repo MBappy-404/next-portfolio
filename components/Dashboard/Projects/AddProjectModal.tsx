@@ -21,7 +21,7 @@ import { Select, SelectItem } from "@heroui/select";
 import { SharedSelection } from "@heroui/system";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FieldValues, useForm } from "react-hook-form";
+import { Controller, FieldValues, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export const technologies = [
@@ -39,6 +39,7 @@ export const technologies = [
   { key: "Node.js", label: "Node.js" },
   { key: "Express.js", label: "Express.js" },
   { key: "MongoDB", label: "MongoDB" },
+  { key: "Prisma", label: "Prisma" },
   { key: "Firebase", label: "Firebase" },
   { key: "Next Auth", label: "Next Auth" },
   { key: "Vercel", label: "Vercel" },
@@ -52,9 +53,17 @@ export const technologies = [
   { key: "Shurjo Pay", label: "Shurjo Pay" },
 ];
 
+const category = [
+  { key: "fullstack", label: "Fullstack" },
+  { key: "UX/UI", label: "UX/UI" },
+  { key: "Inventory", label: "Inventory" },
+  { key: "Uncategorized", label: "Uncategorized" },
+   
+];
+
 export default function AddProjectModal() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const { handleSubmit, register, reset } = useForm();
+  const { handleSubmit, control, register, reset } = useForm();
   const [values, setValues] = useState<string[]>([]);
   const router = useRouter();
 
@@ -65,20 +74,23 @@ export default function AddProjectModal() {
   const createProject = async (data: FieldValues) => {
     const toastId = toast.loading("Adding Project...");
     const formData = new FormData();
-    const technologiesArray = values; // Use the selected values from the state
+  
 
     const project = {
       projectName: data.projectName,
       frontendGitHubLink: data.frontendGitHubLink,
       backendGitHubLink: data.backendGitHubLink,
       liveProjectLink: data.liveProjectLink,
-      technologies: technologiesArray,
+      technologies: data?.technologies,
       projectDescription: data.projectDescription,
+      category: data.category,
+      featured: data.featured,
     };
 
     formData.append("data", JSON.stringify(project));
     formData.append("file", data.projectImage[0]);
     console.log(Object.fromEntries(formData));
+    // console.log(data);
 
     const res = await addProject(formData);
     console.log(res);
@@ -92,7 +104,7 @@ export default function AddProjectModal() {
       onClose();
       reset();
     } else {
-      toast.success("Failed to add project", {
+      toast.error("Failed to add project", {
         id: toastId,
         duration: 2000,
       });
@@ -101,101 +113,141 @@ export default function AddProjectModal() {
 
   return (
     <>
-      <Button
-        className="mt-2 text-sm md:text-base text-gray-900 dark:text-gray-100 px-4"
-        color="primary"
-        variant="flat"
-        radius="sm"
-        onPress={onOpen}
-      >
-        Add  Project
+      <Button onPress={onOpen} color="primary" variant="flat" radius="sm">
+        Add Project
       </Button>
-      <Modal size="3xl" isOpen={isOpen} onOpenChange={onOpenChange}>
+
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        size="4xl"
+        backdrop="blur"
+      >
         <ModalContent>
           <form onSubmit={handleSubmit(createProject)}>
-            <ModalHeader className="flex flex-col gap-1">
-              Add New Project
-            </ModalHeader>
+            <ModalHeader>Add New Project</ModalHeader>
             <ModalBody>
-              <div className="flex justify-center mt-0">
-                <div className="w-full max-w-3xl space-y-4">
-                  {/* Project Name & Upload Project Image (Same Row) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Project Name"
-                      {...register("projectName")}
-                      className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                    />
-                    <input
-                      type="file"
-                      {...register("projectImage")}
-                      className="  w-full bg-white dark:bg-gray-800 text-sm py-0 rounded-md outline-none border-[#dddddd] dark:border-gray-800 border focus:border-[#c5c4c4] transition-all file:cursor-pointer cursor-pointer file:border-0 file:py-[12px] file:px-4 file:mr-4 file:bg-[#DDDDDD]  dark:file:bg-gray-700 dark:focus:border-gray-700 dark:file:text-gray-300 file:text-black dark:text-gray-300"
-                      placeholder="Upload Photo"
-                    />
-                  </div>
+              <div className="space-y-6">
+                {/* Name & Image */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    {...register("projectName", { required: true })}
+                    placeholder="Project Name"
+                    className="w-full rounded-md py-2 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
+                  />
 
-                  {/* GitHub Links (2 columns) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      {...register("frontendGitHubLink")}
-                      placeholder="Frontend GitHub Link"
-                      className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                    />
-                    <input
-                      type="text"
-                      {...register("backendGitHubLink")}
-                      placeholder="Backend GitHub Link"
-                      className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                    />
-                  </div>
-
-                  {/* Live Project Link */}
-
-                  <div className="md:flex w-full gap-4  ">
-                    <input
-                      type="text"
-                      placeholder="Live Project Link"
-                      {...register("liveProjectLink")}
-                      className="w-full  max-w-[355px]  rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                    />
-                    <Select
-                      className="bg-gray-100 hover:bg-gray-100 mt-4 md:mt-0  max-w-[351px]  dark:bg-gray-800"
-                      // label="Select Technologies"
-                      classNames={{
-                        base: "w-full border-gray-300 dark:border-gray-800  rounded-md max-w-[365px] bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700",
-                        innerWrapper: "bg-gray-100   dark:bg-gray-800 ",
-
-                        trigger:
-                          "bg-gray-100 focus:bg-gray-100 dark:bg-gray-800",
-                        selectorIcon: "bg-gray-100 dark:bg-gray-800",
-                      }}
-                      placeholder="Select Technologies"
-                      selectedKeys={values}
-                      selectionMode="multiple"
-                      onSelectionChange={handleSelectionChange}
-                    >
-                      {technologies.map((technology) => (
-                        <SelectItem key={technology.key}>
-                          {technology.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  </div>
-
-                  {/* Project Description */}
-                  <textarea
-                    placeholder="Project Description"
-                    rows={4}
-                    {...register("projectDescription")}
-                    className="w-full rounded-md px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm pt-3 outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                  ></textarea>
+                  <input
+                    type="file"
+                    {...register("projectImage", { required: true })}
+                    className="w-full bg-white dark:bg-gray-800 text-sm rounded-md outline-none border border-gray-300 dark:border-gray-800 focus:border-gray-500 dark:focus:border-gray-700 file:cursor-pointer file:border-0 file:py-3 file:px-4 file:mr-4 file:bg-gray-200 dark:file:bg-gray-700 file:text-black dark:file:text-gray-300"
+                  />
+                  
                 </div>
+
+                {/* GitHub Links */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <input
+                    {...register("frontendGitHubLink", { required: true })}
+                    placeholder="Frontend GitHub Link"
+                    className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
+                  />
+                  <input
+                    {...register("backendGitHubLink")}
+                    placeholder="Backend GitHub Link"
+                    className="w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
+                  />
+                     <input
+                    {...register("liveProjectLink")}
+                    placeholder="Live Project Link"
+                    className="w-full max-w-full rounded-md py-3 px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
+                  />
+                </div>
+
+                {/* Live link, Technologies, Category, Featured */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               
+
+                  {/* Technologies multi-select */}
+                  <Controller
+                    control={control}
+                    name="technologies"
+                    render={({ field: { value, onChange } }) => (
+                      <Select
+                        placeholder="Select Technologies"
+                        selectionMode="multiple"
+                        selectedKeys={new Set(value)}
+                        onSelectionChange={(keys: SharedSelection) =>
+                          onChange(Array.from(keys))
+                        }
+                        classNames={{
+                          base: "w-full rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:ring-2 focus:ring-purple-500",
+                          selectorIcon: "text-gray-500 dark:text-gray-400",
+                        }}
+                      >
+                        {technologies.map((tech) => (
+                          <SelectItem key={tech.key}>{tech.label}</SelectItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
+
+                  {/* Category single-select */}
+                  <Controller
+                    control={control}
+                    name="category"
+                    render={({ field: { value, onChange } }) => (
+                      <Select
+                        placeholder="Select Category"
+                        selectionMode="single"
+                        selectedKeys={new Set([value])}
+                        onSelectionChange={(keys: SharedSelection) =>
+                          onChange(Array.from(keys)[0] || "")
+                        }
+                        classNames={{
+                          base: "w-full rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:ring-2 focus:ring-purple-500",
+                        }}
+                      >
+                        {category.map((cat) => (
+                          <SelectItem key={cat.key}>{cat.label}</SelectItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
+
+                  {/* Featured toggle */}
+                  <Controller
+                    control={control}
+                    name="featured"
+                    render={({ field: { value, onChange } }) => (
+                      <Select
+                        placeholder="Is Featured ?"
+                        selectionMode="single"
+                        onSelectionChange={(keys: SharedSelection) =>
+                          onChange(Array.from(keys)[0] === "yes")
+                        }
+                        classNames={{
+                          base: "w-full rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:ring-2 focus:ring-purple-500",
+                        }}
+                      >
+                        <SelectItem key="yes">Yes</SelectItem>
+                        <SelectItem key="no">No</SelectItem>
+                      </Select>
+                    )}
+                  />
+                </div>
+
+                {/* Description */}
+                <textarea
+                  {...register("projectDescription")}
+                  placeholder="Project Description"
+                  rows={4}
+                  className="w-full rounded-md px-4 py-3 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
+                />
               </div>
             </ModalBody>
+
             <ModalFooter>
-              <Button radius="sm" type="submit" color="primary">
+              <Button type="submit" color="primary" radius="sm">
                 Submit
               </Button>
             </ModalFooter>
