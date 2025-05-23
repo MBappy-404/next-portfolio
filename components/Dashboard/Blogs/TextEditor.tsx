@@ -1,3 +1,6 @@
+/* eslint-disable padding-line-between-statements */
+/* eslint-disable react/jsx-sort-props */
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useEffect } from "react";

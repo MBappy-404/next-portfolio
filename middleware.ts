@@ -12,7 +12,7 @@ export function middleware(req: NextRequest) {
   const userEmail = req.cookies.get("user")?.value
 
   // only allow sara0810@gmail.com
-  if (userEmail !== "sara0810@gmail.com") {
+  if (userEmail !== "sadikulsad0810@gmail.com") {
     const loginUrl = req.nextUrl.clone()
     loginUrl.pathname = "/login"
     return NextResponse.redirect(loginUrl)

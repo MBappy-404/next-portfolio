@@ -113,7 +113,11 @@ export default function AddProjectModal() {
 
   return (
     <>
-      <Button onPress={onOpen} color="primary" variant="flat" radius="sm">
+     <Button
+        className="mt-2 text-sm md:text-base text-gray-900 dark:text-gray-100 px-4"
+        radius="sm"
+        onPress={onOpen}
+      >
         Add Project
       </Button>
 

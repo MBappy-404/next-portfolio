@@ -85,7 +85,7 @@ export default function AddBlogsModal() {
     try {
       const res = await addBlog(newData);
 
-      console.log(res);
+      // console.log(res);
       if (!res.success) {
         toast.error(res?.message, { id: toastId });
       } else if (res.success) {

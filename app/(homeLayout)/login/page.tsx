@@ -26,7 +26,7 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormInputs) => {
     try {
       const res = await createAdmin(data);
-      console.log(res);
+      // console.log(res);
       
       if (res?.success) {
         Cookies.set("user", res.data?.email);

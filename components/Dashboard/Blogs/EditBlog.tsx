@@ -18,9 +18,11 @@ import {
   ModalHeader,
 } from "@heroui/modal";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { FieldValues, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import TextEditor from "./TextEditor";
+
 export default function EditBlogsModal({
   blog,
   isOpen,
@@ -33,6 +35,7 @@ export default function EditBlogsModal({
   onClose: () => void;
 }) {
   const { handleSubmit, register, reset } = useForm();
+  const [content, setContent] = useState("");
   const router = useRouter();
   useEffect(() => {
     if (blog) {
@@ -43,45 +46,95 @@ export default function EditBlogsModal({
         blogImage: blog.blogImage || "",
         description: blog.description || "",
       });
+       setContent(blog.description || "");
     }
   }, [blog, reset]);
-  const handleUpdateBlog = async (data: FieldValues) => {
-    const toastId = toast.loading("Updating Blog...");
-    const formData = new FormData();
+  const upload_preset = "my-portfolio";
+  const cloud_name = "dquplidvy";
+
+  const onSubmit: SubmitHandler<FieldValues> = async (formData) => {
+    const toastId = toast.loading("Updating Blog", { duration: Infinity });
+
+    let finalContent = content;
+    const imagesToUpload: { src: string; originalTag: string }[] = [];
+
+    const imgRegex = /<img[^>]+src="(data:image\/[^;]+;base64,[^"]+)"[^>]*>/g;
+    let match;
+    while ((match = imgRegex.exec(content)) !== null) {
+      imagesToUpload.push({ src: match[1], originalTag: match[0] });
+    }
+
+    for (const img of imagesToUpload) {
+      try {
+        const imageData = new FormData();
+        imageData.append("file", img.src);
+        imageData.append("upload_preset", upload_preset);
+        imageData.append("cloud_name", cloud_name);
+
+        const imageUploadResult = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+          {
+            method: "POST",
+            body: imageData,
+          }
+        );
+
+        if (!imageUploadResult.ok) {
+          throw new Error("Embedded image upload failed");
+        }
+
+        const uploadedImage = await imageUploadResult.json();
+        const newImgTag = img.originalTag.replace(img.src, uploadedImage.url);
+        finalContent = finalContent.replace(img.originalTag, newImgTag);
+      } catch (error: any) {
+        console.error("Error uploading embedded image:", error);
+        toast.error("Failed to upload an embedded image.", { id: toastId });
+      }
+    }
+
     const blogData = {
-      ...data,
+      author: "Saroar Jahan",
+      title: formData.title,
+      category: formData.category,
+      description: finalContent,
     };
 
-    // console.log(blogData);
+    const newData = new FormData();
+    newData.append("data", JSON.stringify(blogData));
+    newData.append("file", formData.blogImage[0]);
 
-    formData.append("data", JSON.stringify(blogData));
-    formData.append("file", data.blogImage[0]);
-    console.log(Object.fromEntries(formData));
+    try {
+      const res = await updateBlog(newData, blog._id);
 
-    const res = await updateBlog(formData, blog._id);
-    console.log(res);
-
-    if (res?.success) {
-      toast.success("Project updated successfully", {
-        id: toastId,
-        duration: 2000,
-      });
-      router.refresh();
-      onClose();
-    } else {
-      toast.success("Failed to update project", {
-        id: toastId,
-        duration: 2000,
-      });
+      // console.log(res);
+      if (!res.success) {
+        toast.error(res?.message, { id: toastId });
+      } else if (res.success) {
+        toast.success(res?.message, { id: toastId });
+        reset();
+        setContent("");
+        router.refresh();
+        onClose();
+      }
+    } catch (err: any) {
+      console.error("Error creating blog:", err);
+      toast.error("Something went wrong!", { id: toastId });
+    } finally {
+      toast.dismiss(toastId);
     }
   };
-
   return (
     <>
       {/* <Button onPress={onOpen}>Add New Blog</Button> */}
-      <Modal size="3xl" isOpen={isOpen} backdrop="blur" onOpenChange={onOpenChange}>
+      <Modal
+        size="3xl"
+        isOpen={isOpen}
+        backdrop="blur"
+        onOpenChange={onOpenChange}
+        className=" h-[90vh] overflow-y-auto"
+      >
         <ModalContent>
-          <form onSubmit={handleSubmit(handleUpdateBlog)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <ModalHeader className="flex flex-col gap-1">
               Add New Blog
             </ModalHeader>
@@ -117,12 +170,9 @@ export default function EditBlogsModal({
                   </select>
 
                   {/* Blog Description */}
-                  <textarea
-                    placeholder="Blog Description"
-                    {...register("description")}
-                    rows={4}
-                    className="w-full rounded-md px-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm pt-3 outline-none border border-gray-300 dark:border-gray-800 focus:bg-gray-50 dark:focus:border-gray-700"
-                  ></textarea>
+                  <div>
+                    <TextEditor content={content} setContent={setContent} />
+                  </div>
                 </div>
               </div>
             </ModalBody>
